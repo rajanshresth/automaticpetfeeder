@@ -2,12 +2,18 @@ import React, { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [timeInterval, setTimeInterval] = useState("");
-  console.log(timeInterval);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const router = useRouter();
+
   const handleSubmit = async (event: any) => {
     event.preventDefault();
+    setMessage("Sending...");
+    setError("");
 
     const response = await fetch("/api/servo", {
       method: "POST",
@@ -18,17 +24,17 @@ export default function Home() {
     });
 
     if (!response.ok) {
-      // handle error
+      setError("An error occurred. Please try again.");
+    } else {
+      setMessage("Time interval set successfully!");
     }
-
-    // handle success
+    router.refresh();
   };
-  console.log(handleSubmit);
 
   return (
-    <div className="flex items-center justify-center h-screen">
+    <div className="flex items-center justify-center h-screen p-4">
       <form
-        className="grid gap-4 w-full max-w-sm items-center"
+        className="grid gap-4 w-full max-w-sm items-center p-4 bg-white shadow rounded"
         onSubmit={handleSubmit}
       >
         <Label htmlFor="time-interval">Set Time Interval (in minutes)</Label>
@@ -41,6 +47,8 @@ export default function Home() {
           onChange={(e) => setTimeInterval(e.target.value)}
         />
         <Button type="submit">Confirm</Button>
+        {message && <p className="text-green-500">{message}</p>}
+        {error && <p className="text-red-500">{error}</p>}
       </form>
     </div>
   );
