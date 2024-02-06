@@ -1,18 +1,20 @@
-// pages/api/servo.ts
-import { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiRequest, NextApiResponse } from "next";
+import axios from "axios";
 
-interface RequestWithBody extends NextApiRequest {
-  body: {
-    value: number;
-  };
-}
+let timeInterval = 0; // Store the time interval
 
-export default function handler(req: RequestWithBody, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   if (req.method === "POST") {
-    const { value } = req.body;
-    console.log(`Received value: ${value}`);
-    res.json({ status: "ok" });
+    const { timeInterval: newTimeInterval } = req.body;
+    timeInterval = newTimeInterval; // Update the time interval
+
+    res.status(200).json({ success: true });
+  } else if (req.method === "GET") {
+    res.status(200).json({ timeInterval }); // Return the time interval
   } else {
-    res.status(405).json({ message: "Method Not Allowed" });
+    res.status(405).json({ success: false, message: "Method not allowed" });
   }
 }
